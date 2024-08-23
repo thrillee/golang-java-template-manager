@@ -32,7 +32,6 @@ func processFile(filePath, ogArtifactId, artifactId string) error {
 }
 
 func createVisitFileFunc(artifactId, ogArtifactId string) filepath.WalkFunc {
-	var renamedDir string
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			fmt.Printf("Error accessing %s: %v\n", path, err)
@@ -41,6 +40,27 @@ func createVisitFileFunc(artifactId, ogArtifactId string) filepath.WalkFunc {
 		if info.IsDir() && info.Name() == ".git" {
 			return filepath.SkipDir
 		}
+		if !info.IsDir() {
+			err := processFile(path, ogArtifactId, artifactId)
+			if err != nil {
+				fmt.Printf("Error processing file %s: %v\n", path, err)
+			}
+		}
+		return nil
+	}
+}
+
+func createVisitFolderFunc(artifactId, ogArtifactId string) filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Printf("Error accessing dir %s: %v\n", path, err)
+			return nil
+		}
+
+		if info.IsDir() && info.Name() == ".git" {
+			return filepath.SkipDir
+		}
+
 		if info.IsDir() {
 			if info.Name() == ogArtifactId {
 				newPath := filepath.Join(filepath.Dir(path), artifactId)
@@ -48,24 +68,11 @@ func createVisitFileFunc(artifactId, ogArtifactId string) filepath.WalkFunc {
 				if err != nil {
 					fmt.Printf("Error renaming folder: %v\n", err)
 				} else {
-					renamedDir = path
 					return filepath.SkipDir
 				}
 			}
-		} else {
-			if renamedDir != "" && strings.HasPrefix(path, renamedDir) {
-				newPath := filepath.Join(artifactId, strings.TrimPrefix(path, renamedDir))
-				err := processFile(newPath, ogArtifactId, artifactId)
-				if err != nil {
-					fmt.Printf("Error processing file %s: %v\n", newPath, err)
-				}
-			} else {
-				err := processFile(path, ogArtifactId, artifactId)
-				if err != nil {
-					fmt.Printf("Error processing file %s: %v\n", path, err)
-				}
-			}
 		}
+
 		return nil
 	}
 }
@@ -87,6 +94,9 @@ func HandleNewProject(d NewProject) error {
 
 	visitFileFunc := createVisitFileFunc(d.ArtifactId, d.OgArtifactId)
 	err = filepath.Walk(newProjectDir, visitFileFunc)
+
+	visitFolderFunc := createVisitFolderFunc(d.ArtifactId, d.OgArtifactId)
+	err = filepath.Walk(newProjectDir, visitFolderFunc)
 
 	return err
 }

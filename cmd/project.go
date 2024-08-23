@@ -51,7 +51,7 @@ func handleSimpleWebCMD(simpleWebCMD *cobra.Command, args []string) {
 
 	data := internals.NewProject{
 		ProjectType:  "simple-web",
-		OgArtifactId: "simple-web",
+		OgArtifactId: "simple_web",
 		ArtifactId:   artifactId,
 		GroupId:      groupId,
 		Dir:          dir,
