@@ -5,7 +5,7 @@
 
 ### dotenv ###
 .env
-jpt
+jpt*
 
 #!! ERROR: env is undefined. Use list command to see defined gitignore types !!#
 
