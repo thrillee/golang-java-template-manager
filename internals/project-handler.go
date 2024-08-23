@@ -58,6 +58,10 @@ func createVisitFolderFunc(artifactId, ogArtifactId string) filepath.WalkFunc {
 		}
 
 		if info.IsDir() && info.Name() == ".git" {
+			err := os.RemoveAll(path)
+			if err != nil {
+				fmt.Printf("Error deleting .git folder at %s: %v\n", path, err)
+			}
 			return filepath.SkipDir
 		}
 
@@ -98,5 +102,6 @@ func HandleNewProject(d NewProject) error {
 	visitFolderFunc := createVisitFolderFunc(d.ArtifactId, d.OgArtifactId)
 	err = filepath.Walk(newProjectDir, visitFolderFunc)
 
+	fmt.Printf("Project %s created at %s\n", d.ProjectName, newProjectDir)
 	return err
 }
