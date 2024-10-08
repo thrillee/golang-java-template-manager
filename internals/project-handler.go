@@ -23,6 +23,9 @@ func processFile(filePath, ogArtifactId, artifactId string) error {
 	}
 
 	newContent := strings.ReplaceAll(string(content), ogArtifactId, artifactId)
+	// Update Persistence
+	newContent = strings.ReplaceAll(newContent, fmt.Sprintf("%sPU", ogArtifactId), fmt.Sprintf("%sPU", ogArtifactId))
+
 	err = os.WriteFile(filePath, []byte(newContent), os.ModePerm)
 	if err != nil {
 		return err
