@@ -8,7 +8,7 @@ import (
 )
 
 var simpleWebCMD = &cobra.Command{
-	Use:   "simple-web",
+	Use:   "project",
 	Short: "Create A Simple Jakrata Web Project",
 	Long:  `Create A Simple Jakrata Web Project`,
 	Run:   handleSimpleWebCMD,
@@ -17,11 +17,13 @@ var simpleWebCMD = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(simpleWebCMD)
 
+	simpleWebCMD.Flags().StringP("projectType", "t", "simple-web", "Project Type")
 	simpleWebCMD.Flags().StringP("project", "p", "", "Project Name")
 	simpleWebCMD.Flags().StringP("groupId", "g", "", "Group ID")
 	simpleWebCMD.Flags().StringP("artifactId", "a", "", "Artifact ID")
 	simpleWebCMD.Flags().StringP("dir", "d", "", "Directory to create project")
 
+	simpleWebCMD.MarkFlagRequired("projectType")
 	simpleWebCMD.MarkFlagRequired("groupId")
 	simpleWebCMD.MarkFlagRequired("artifactId")
 	simpleWebCMD.MarkFlagRequired("dir")
@@ -49,8 +51,13 @@ func handleSimpleWebCMD(simpleWebCMD *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
+	projectType, err := simpleWebCMD.Flags().GetString("projectType")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	data := internals.NewProject{
-		ProjectType:  "simple-web",
+		ProjectType:  projectType,
 		OgArtifactId: "simple_web",
 		ArtifactId:   artifactId,
 		GroupId:      groupId,

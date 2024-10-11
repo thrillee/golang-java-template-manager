@@ -8,12 +8,13 @@ import (
 )
 
 type NewProject struct {
-	ProjectName  string
-	Dir          string
-	GroupId      string
-	ArtifactId   string
-	OgArtifactId string
-	ProjectType  string
+	ProjectName   string
+	Dir           string
+	GroupId       string
+	ArtifactId    string
+	OgArtifactId  string
+	ProjectType   string
+	ProjectBranch string
 }
 
 func processFile(filePath, ogArtifactId, artifactId string) error {
@@ -89,12 +90,12 @@ func HandleNewProject(d NewProject) error {
 	newProjectDir := filepath.Join(d.Dir, projectDirName)
 	os.Mkdir(newProjectDir, os.ModePerm)
 
-	repoURL := getRepoURL(d.ProjectType)
-	if repoURL == "" {
+	repo := getRepoURL(d.ProjectType)
+	if repo == nil {
 		return fmt.Errorf("Project template not found")
 	}
 
-	err := cloneRepo(repoURL, newProjectDir)
+	err := cloneRepo(repo, newProjectDir)
 	if err != nil {
 		return err
 	}

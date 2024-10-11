@@ -1,14 +1,26 @@
 package internals
 
-var repoStore = map[string]string{
-	"simple-web": "https://bitbucket.org/blackcoders2019/simple_web.git",
+type repo struct {
+	url    string
+	branch string
 }
 
-func getRepoURL(repo string) string {
-	url, ok := repoStore[repo]
+var repoStore = map[string]repo{
+	"simple-web": {
+		url:    "https://bitbucket.org/blackcoders2019/simple_web.git",
+		branch: "master",
+	},
+	"mvn-wildfly": {
+		url:    "https://bitbucket.org/blackcoders2019/simple_web.git",
+		branch: "features/wildfly",
+	},
+}
+
+func getRepoURL(repo string) *repo {
+	r, ok := repoStore[repo]
 	if !ok {
-		return ""
+		return nil
 	}
 
-	return url
+	return &r
 }
